@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { makeGETRequest } from "./utility/API";
+import { useEffect, useState } from "react";
+import { Card, Col, Row, Switch } from "antd";
+import TableView from "./components/TableView";
+import ChartView from "./components/ChartView";
 
-function App() {
+const App = () => {
+  const [notifications, setNotifications] = useState([]);
+  const [showTableView, setShowTableView] = useState(false);
+
+  useEffect(() => {
+    makeGETRequest("http://127.0.0.1:8000/api/circleci").then((response) => {
+      setNotifications(response);
+      console.log(response);
+    });
+  }, []);
+
+  const handleSwitchValueChange = () => {
+    setShowTableView((showTableView) => !showTableView);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Card style={{ margin: "2%" }}>
+      <Row style={{ marginBottom: "10px" }}>
+        <Col span={6} offset={18}>
+          Show Data as Table
+          <Switch checked={showTableView} onChange={handleSwitchValueChange} />
+        </Col>
+      </Row>
+      {showTableView ? (
+        <TableView notifications={notifications} />
+      ) : (
+        <ChartView notifications={notifications} />
+      )}
+    </Card>
   );
-}
+};
 
 export default App;
